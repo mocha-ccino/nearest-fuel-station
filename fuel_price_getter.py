@@ -4,30 +4,14 @@ import re
 import os
 import logging
 
-# gov_fuel_retailers_url = "https://www.gov.uk/guidance/access-fuel-price-data"
-# resp = requests.get(gov_fuel_retailers_url)
-# gov_html = resp.text
-
-# soup = BeautifulSoup(gov_html, features="html.parser")
-# fuel_json_urls = soup.find_all('td')[1::2]
-
-# website_pattern = re.compile(pattern=r"https?:\/\/([^\/]+)")
-# for json_url in fuel_json_urls:
-#     raw_url = json_url.get_text()
-#     if "shell" not in raw_url:
-#         print(f"ACCESSING RAW URL: {raw_url}")
-#         current_json = requests.get(raw_url)
-#         filename = re.match(pattern=website_pattern, string=raw_url)
-#         filename = filename.group(1)
-#         with open(f'fuel_jsons/{filename}', 'w') as file:
-#             file.write(current_json.text)
-#             print("file written")
-
-# print("ok done")
+json_log_file = "logs/json_getter.log"
+logging.basicConfig(filename=json_log_file, filemode="w", format="%(asctime)s - %(levelname)s - %(message)s", level=logging.INFO)
 
 website_pattern = re.compile(pattern=r"https?:\/\/([^\/]+)")
 json_directory = "fuel-jsons"
+
 def update_fuel_data() -> None:
+    logging.info("Run beginning.")
     """Updates the directory name specified in json_directory — creating it if it doesn't exist — with the current versions of the files by scraping the goverment website they're uploaded to and downloading them."""
     
     os.makedirs(f'{json_directory}', exist_ok=True)
@@ -46,13 +30,18 @@ def update_fuel_data() -> None:
         for exception in exceptions: # shell's link is a HTML page that redirects to something that errors out for me, hence i just exclude it here
             if exception not in raw_url:
                 try:
-                    current_json = requests.get(raw_url)
+                    logging.info(f"Attempting download for {raw_url}")
+                    current_json = requests.get(raw_url, timeout=10)
+                except requests.exceptions.Timeout:
+                    logging.error(f"Request timed out")
                 except Exception as e:
-                    print(e)
+                    logging.error(f"JSON download failed, exception {e}")
                     continue
 
                 filename = re.match(pattern=website_pattern, string=raw_url).group(1).replace("www.", "")
                 with open(f'{json_directory}/{filename}', 'w+') as file:
                     file.write(current_json.text)
+
+    logging.info("Finished run.")
 
 update_fuel_data()
