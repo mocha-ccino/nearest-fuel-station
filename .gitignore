@@ -1,5 +1,6 @@
 # manually added
 fuel-env
+fuel-jsons
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
