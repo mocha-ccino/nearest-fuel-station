@@ -5,12 +5,12 @@ import os
 import logging
 
 json_log_file = "logs/json_getter.log"
-logging.basicConfig(filename=json_log_file, filemode="w", format="%(asctime)s - %(levelname)s - %(message)s", level=logging.INFO)
+logging.basicConfig(filename=json_log_file, filemode="a", format="%(asctime)s - %(levelname)s - %(message)s", level=logging.INFO)
 
 website_pattern = re.compile(pattern=r"https?:\/\/([^\/]+)")
 json_directory = "fuel-jsons"
 
-def update_fuel_data() -> None:
+def download_fuel_data() -> None:
     logging.info("Run beginning.")
     """Updates the directory name specified in json_directory — creating it if it doesn't exist — with the current versions of the files by scraping the goverment website they're uploaded to and downloading them."""
     
@@ -39,9 +39,7 @@ def update_fuel_data() -> None:
                     continue
 
                 filename = re.match(pattern=website_pattern, string=raw_url).group(1).replace("www.", "")
-                with open(f'{json_directory}/{filename}', 'w+') as file:
+                with open(f'{json_directory}/{filename}.json', 'w+') as file:
                     file.write(current_json.text)
 
     logging.info("Finished run.")
-
-update_fuel_data()
