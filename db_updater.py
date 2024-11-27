@@ -8,10 +8,10 @@ import logging
 load_dotenv()
 os.makedirs('logs', exist_ok=True)
 
-
 conn_str = os.environ.get("MONGO_CONNSTR")
 client = pymongo.MongoClient(conn_str)
 
+# logger configuration
 db_log_file = "logs/db_refresh.log"
 logger = logging.getLogger("refresh_logger")
 logger.setLevel(logging.INFO)
@@ -43,5 +43,5 @@ for file in fuel_files:
             all_stations.append(station)
     logger.info("File finished.")
 
-fuel_db.drop_collection("fuel_col")
+fuel_col.delete_many({})
 update = fuel_col.insert_many(all_stations)
