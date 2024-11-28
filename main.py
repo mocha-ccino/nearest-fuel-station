@@ -9,13 +9,13 @@ from typing import Callable
 screen_dimensions = get_screen_dimensions()
 window_dimensions = [math.floor(x * 0.82) for x in screen_dimensions]
 
-def show_frame(container: tk.Tk, frame_class: Callable) -> None:
+def show_frame(container: tk.Frame, frame_class) -> None:
     """Destroy the current frame and replace it with a new one."""
     for widget in container.winfo_children():
         widget.destroy()
 
     frame = frame_class(container)   
-    frame.pack(fill="both") 
+    frame.pack(fill="both")
 
 def main():
     root = tk.Tk()

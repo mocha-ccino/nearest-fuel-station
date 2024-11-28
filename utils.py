@@ -1,13 +1,10 @@
 import tkinter as tk
 from tkinter import ttk
+import pyautogui
 
 def get_screen_dimensions():
-    dummy = tk.Tk()
-    dummy.tk.call('tk', 'scaling', 1.0)
-    height = dummy.winfo_screenheight()
-    width = dummy.winfo_screenwidth()
-    dummy.destroy()
-    return [width, height]
+    size = pyautogui.size()
+    return (size[0], size[1])
 
 def get_text(event):
     widget = event.widget

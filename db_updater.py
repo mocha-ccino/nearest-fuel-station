@@ -6,7 +6,7 @@ import json
 import logging
 
 load_dotenv()
-os.makedirs('logs', exist_ok=True)
+os.makedirs("logs", exist_ok=True)
 
 conn_str = os.environ.get("MONGO_CONNSTR")
 client = pymongo.MongoClient(conn_str)
@@ -34,14 +34,21 @@ all_stations = []
 logger.info("Starting processing...")
 for file in fuel_files:
     logger.info(f"Opening file: {file}")
-    with open(os.path.join(json_dir, file), 'r') as cur_file:
+    with open(os.path.join(json_dir, file), "r") as cur_file:
         cur_file = json.load(cur_file)
-        cur_stations = cur_file['stations']
+        cur_stations = cur_file["stations"]
         for station in cur_stations:
-            station["location"]["longitude"] = float(station["location"]["longitude"])
-            station["location"]["latitude"] = float(station["location"]["latitude"])
+
+            station["location"] = {
+                "type": "Point",
+                "coordinates": [
+                    float(station["location"]["longitude"]),
+                    float(station["location"]["latitude"]),
+                ],
+            }
             all_stations.append(station)
     logger.info("File finished.")
 
 fuel_col.delete_many({})
+fuel_col.create_index([("location", "2dsphere")])
 update = fuel_col.insert_many(all_stations)
