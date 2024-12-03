@@ -3,9 +3,12 @@ from tkinter import ttk
 import math
 from utils import get_screen_dimensions
 from screens import MainScreen
+from db_updater import db_refesher
 
 from typing import Callable
 
+
+db_refesher()
 screen_dimensions = get_screen_dimensions()
 window_dimensions = [math.floor(x * 0.82) for x in screen_dimensions]
 
