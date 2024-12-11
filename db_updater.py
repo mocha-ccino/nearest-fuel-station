@@ -5,11 +5,7 @@ import os
 import json
 import logging
 
-load_dotenv()
 os.makedirs("logs", exist_ok=True)
-
-conn_str = os.environ.get("MONGO_CONNSTR")
-client = pymongo.MongoClient(conn_str)
 
 # logger configuration
 db_log_file = "logs/db_refresh.log"
@@ -20,13 +16,15 @@ formatter = logging.Formatter("%(asctime)s - %(levelname)s - %(message)s")
 file_handler.setFormatter(formatter)
 logger.addHandler(file_handler)
 
-fuel_db = client["fuel_db"]
-fuel_col = fuel_db["fuel_col"]
 
-def db_refesher() -> None:
+def db_refesher(conn_str: str) -> None:
     """
     Downloads all the fuel data once more, and refreshes the Mongo database with it, making sure to convert locations to 2dsphere indexes first.
     """
+
+    client = pymongo.MongoClient(conn_str)
+    fuel_db = client["fuel_db"]
+    fuel_col = fuel_db["fuel_col"]
 
     download_fuel_data()
     json_dir = os.path.join("fuel-jsons")
